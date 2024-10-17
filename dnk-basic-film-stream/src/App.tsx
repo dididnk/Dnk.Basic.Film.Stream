@@ -162,22 +162,22 @@ const App: React.FC = () => {
   /** Componenet : Filter */
   const FilmFilter = () => {
     return <div className='filter-content'>
-    <div className="filter-pagination-details">
-      <h3>Gérer l'affichage des films</h3>
-      <div className="pagination">
-        <button disabled={page === 1} onClick={handlePrevPage}>
-          <span>&#9204;</span>
-        </button>
-        <select onChange={(e) => setItemsPerPage(parseInt(e.target.value))} value={itemsPerPage}>
-          <option value={4}>4</option>
-          <option value={8}>8</option>
-          <option value={12}>12</option>
-        </select>
-        <button onClick={handleNextPage}>
-          <span>&#9205;</span>
-        </button>
+      <div className="filter-pagination-details">
+        <h3>Gérer l'affichage des films</h3>
+        <div className="pagination">
+          <button disabled={page === 1} onClick={handlePrevPage}>
+            <span>&#9204;</span>
+          </button>
+          <select onChange={(e) => setItemsPerPage(parseInt(e.target.value))} value={itemsPerPage}>
+            <option value={4}>4</option>
+            <option value={8}>8</option>
+            <option value={12}>12</option>
+          </select>
+          <button onClick={handleNextPage}>
+            <span>&#9205;</span>
+          </button>
+        </div>
       </div>
-    </div>
       <div className="filter-content-details">
         <h3>Filtrer le film</h3>
         <div className="filter">
@@ -275,8 +275,12 @@ const App: React.FC = () => {
         currentMovieIndex={currentMovieIndex}
         setCurrentMovieIndex={setCurrentMovieIndex}
       />
-      <FilmFilter />
+      {movies.length > 1 && (
+        <FilmFilter />
+      )}
+      {movies.length > 0 && (
       <MovieCards />
+      )}
       <AppFooter />
     </div>
   );

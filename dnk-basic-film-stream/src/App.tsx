@@ -1,106 +1,132 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import { movies$ } from './movies';
+import { movies$ as fetchMovies } from './movies';
 import { Movie } from './movie';
-
-const DEFAULT_BACKGROUND_URL = 'https://dididnk.github.io/Portfolio/include/img/Mybackground-1.jpg';
+import { MovieWithState } from './movie-with-state';
 
 const App: React.FC = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
-  const [currentMovieIndex, setCurrentMovieIndex] = useState<number>(0);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [movies, setMovies] = useState<MovieWithState[]>([]);
+  const [filteredMovies, setFilteredMovies] = useState<MovieWithState[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(4);
-  const [paginatedMovies, setPaginatedMovies] = useState<Movie[]>([]);
+  const [perPage, setPerPage] = useState(4);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentMovieIndex, setCurrentMovieIndex] = useState(0);
 
+  // Fetch movies data asynchronously and add "liked" and "disliked" states
   useEffect(() => {
-    movies$.then((data: Movie[]) => {
-      const updatedMovies = data.map(movie => ({
-        ...movie,
-        liked: false,
-        disliked: false
-      }));
-      setMovies(updatedMovies);
-      setFilteredMovies(updatedMovies);
-      setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-      setCurrentMovieIndex(0);
-      setPaginatedMovies(updatedMovies.slice(0, itemsPerPage));
+    const getMovies = async () => {
+      try {
+        const moviesData = await fetchMovies;
+        const moviesWithState = moviesData.map((movie: Movie[]) => ({
+          ...movie,
+          liked: false,
+          disliked: false,
+        }));
+        setMovies(moviesWithState);
+        setFilteredMovies(moviesWithState);
+      } catch (error) {
+        console.error('Error fetching movies:', error);
+      }
+    };
+    getMovies();
+  }, []);
+
+  // Like a movie
+  const LikeMovie = (id: string) => {
+    const updatedMovies = filteredMovies.map((movie) => {
+      if (movie.id === id) {
+        if (movie.liked) {
+          return { ...movie, likes: movie.likes - 1, liked: false };
+        } else {
+          const adjustedLikes = movie.disliked ? movie.likes + 1 : movie.likes + 1;
+          const adjustedDislikes = movie.disliked ? movie.dislikes - 1 : movie.dislikes;
+          return { ...movie, likes: adjustedLikes, dislikes: adjustedDislikes, liked: true, disliked: false };
+        }
+      }
+      return movie;
     });
-  }, [itemsPerPage]);
+    setFilteredMovies(updatedMovies);
+    setMovies(
+      movies.map((movie) =>
+        movie.id === id
+          ? { ...movie, likes: updatedMovies.find((m) => m.id === id)?.likes!, dislikes: updatedMovies.find((m) => m.id === id)?.dislikes!, liked: updatedMovies.find((m) => m.id === id)?.liked!, disliked: updatedMovies.find((m) => m.id === id)?.disliked! }
+          : movie
+      )
+    );
+  };
 
+  // Dislike a movie
+  const DislikeMovie = (id: string) => {
+    const updatedMovies = filteredMovies.map((movie) => {
+      if (movie.id === id) {
+        if (movie.disliked) {
+          // If already disliked, undo the dislike
+          return { ...movie, dislikes: movie.dislikes - 1, disliked: false };
+        } else {
+          // Dislike the movie, and remove like if previously liked
+          const adjustedDislikes = movie.liked ? movie.dislikes + 1 : movie.dislikes + 1;
+          const adjustedLikes = movie.liked ? movie.likes - 1 : movie.likes;
+          return { ...movie, likes: adjustedLikes, dislikes: adjustedDislikes, liked: false, disliked: true };
+        }
+      }
+      return movie;
+    });
+    setFilteredMovies(updatedMovies);
+    setMovies(
+      movies.map((movie) =>
+        movie.id === id
+          ? { ...movie, likes: updatedMovies.find((m) => m.id === id)?.likes!, dislikes: updatedMovies.find((m) => m.id === id)?.dislikes!, liked: updatedMovies.find((m) => m.id === id)?.liked!, disliked: updatedMovies.find((m) => m.id === id)?.disliked! }
+          : movie
+      )
+    );
+  };
+
+  // Filter movies by selected categories
+  const FilterFilmByCategory = (category: string) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  // Filtered list by categories and preserve any removals/updates
   useEffect(() => {
-    const startIndex = (page - 1) * itemsPerPage;
-    setPaginatedMovies(movies.slice(startIndex, startIndex + itemsPerPage));
-  }, [movies, page, itemsPerPage]);
+    let updatedMovies = [...movies];
 
-  const handleNextPage = () => setPage((prevPage) => prevPage + 1);
-  const handlePrevPage = () => setPage((prevPage) => (prevPage > 1 ? prevPage - 1 : 1));
+    if (selectedCategories.length > 0) {
+      updatedMovies = updatedMovies.filter((movie) =>
+        selectedCategories.includes(movie.category)
+      );
+    }
 
-  const startIndex = (page - 1) * itemsPerPage;
+    setFilteredMovies(updatedMovies);
+  }, [selectedCategories, movies]);
 
-  const toggleLike = (id: string) => {
-    setMovies((prevMovies) =>
-      prevMovies.map((movie) =>
-        movie.id === id
-          ? {
-            ...movie,
-            likes: movie.liked ? movie.likes - 1 : movie.likes + 1,
-            liked: !movie.liked,
-            disliked: false,
-            dislikes: movie.liked ? movie.dislikes - (movie.disliked ? 1 : 0) : movie.dislikes,
-          }
-          : movie
-      )
-    );
-  };
-
-  const toggleDislike = (id: string) => {
-    setMovies((prevMovies) =>
-      prevMovies.map((movie) =>
-        movie.id === id
-          ? {
-            ...movie,
-            dislikes: movie.disliked ? movie.dislikes - 1 : movie.dislikes + 1,
-            disliked: !movie.disliked,
-            liked: false,
-            likes: movie.disliked ? movie.likes - (movie.liked ? 1 : 0) : movie.likes,
-          }
-          : movie
-      )
-    );
-  };
-
-  const deleteMovie = (id: string) => {
+  // Remove a movie from both the original and filtered list
+  const RemoveFilm = (id: string) => {
     const updatedMovies = movies.filter((movie) => movie.id !== id);
     setMovies(updatedMovies);
-    setFilteredMovies(updatedMovies);
-    setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-    setCurrentMovieIndex(0);
+    setFilteredMovies(filteredMovies.filter((movie) => movie.id !== id));
   };
 
-  const handleFilterChange = (category: string) => {
-    const updatedCategories = selectedCategories.includes(category)
-      ? selectedCategories.filter((cat) => cat !== category)
-      : [...selectedCategories, category];
+  // Pagination logic
+  const totalPages = Math.ceil(filteredMovies.length / perPage);
+  const paginatedMovies = filteredMovies.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage
+  );
 
-    setSelectedCategories(updatedCategories);
-
-    const filtered = movies.filter(
-      (movie) => updatedCategories.length === 0 || updatedCategories.includes(movie.category)
-    );
-    setFilteredMovies(filtered);
-  };
-
-  /** Components */
-  /** Component : App header */
+  /** Page components */
+  // Header
   const AppHeader: React.FC<{
-    movie: Movie | null;
-    filteredMovies: Movie[];
+    movie: MovieWithState | null;
+    filteredMovies: MovieWithState[];
     currentMovieIndex: number;
     setCurrentMovieIndex: (index: number) => void;
   }> = ({ movie, filteredMovies, currentMovieIndex, setCurrentMovieIndex }) => {
+    const DEFAULT_BACKGROUND_URL = 'https://dididnk.github.io/Portfolio/include/img/Mybackground-1.jpg';
+
     const backgroundUrl = movie ? movie.image : DEFAULT_BACKGROUND_URL;
     const title = movie ? movie.title : "Exercice Frontend : Listing de vidéos";
     const category = movie ? movie.category : "Codé par Emmanuel NGBAME";
@@ -159,21 +185,21 @@ const App: React.FC = () => {
     );
   };
 
-  /** Componenet : Filter */
-  const FilmFilter = () => {
-    return <div className='filter-content'>
+  // Movie filter and management view
+  const MovieFilterSection = () => {
+    return <div className="filter-content">
       <div className="filter-pagination-details">
         <h3>Gérer l'affichage des films</h3>
         <div className="pagination">
-          <button disabled={page === 1} onClick={handlePrevPage}>
+          <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
             <span>&#9204;</span>
           </button>
-          <select onChange={(e) => setItemsPerPage(parseInt(e.target.value))} value={itemsPerPage}>
+          <select value={perPage} onChange={(e) => setPerPage(parseInt(e.target.value))}>
             <option value={4}>4</option>
             <option value={8}>8</option>
             <option value={12}>12</option>
           </select>
-          <button onClick={handleNextPage}>
+          <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
             <span>&#9205;</span>
           </button>
         </div>
@@ -181,12 +207,12 @@ const App: React.FC = () => {
       <div className="filter-content-details">
         <h3>Filtrer le film</h3>
         <div className="filter">
-          {categories.map((category) => (
+          {Array.from(new Set(movies.map((movie) => movie.category))).map((category) => (
             <label key={category} className="checkbox">
               <input
                 type="checkbox"
                 checked={selectedCategories.includes(category)}
-                onChange={() => handleFilterChange(category)}
+                onClick={() => FilterFilmByCategory(category)}
               />
               <span>{category}</span>
             </label>
@@ -196,75 +222,41 @@ const App: React.FC = () => {
     </div>
   }
 
-  /** Component : Movies (cards) */
-  const MovieCards = () => {
-    return (
-      <div className="movies-grid">
-        {paginatedMovies.map((movie, index) => (
-          <div
-            key={movie.id}
-            className="movie-card"
-            onClick={() => handleMovieClick(movie, startIndex + index)}
-          >
-            <div
-              className="image"
-              style={{
-                background: `url(${movie.image}) no-repeat center center`,
-                backgroundSize: 'cover',
-              }}
-            ></div>
-            <div className="details">
-              <div className="delete">
-                <button onClick={() => deleteMovie(movie.id)}>✖</button>
+  // Movies
+  const MovieCardSection = () => {
+    return <div className="movies-grid" >
+      {paginatedMovies.map((movie) => (
+        <div key={movie.id} className="movie-card">
+          <div className="image" style={{ background: `url(${movie.image}) no-repeat center center`, backgroundSize: 'cover' }}></div>
+          <div className="details">
+            <div className="delete">
+              <button onClick={() => RemoveFilm(movie.id)}>✖</button>
+            </div>
+            <h2><strong>{movie.title}</strong></h2>
+            <p>{movie.category}</p>
+            <div className="like-bar">
+              <div onClick={() => LikeMovie(movie.id)} className={movie.liked ? 'liked like' : 'like'} style={{ backgroundColor: movie.liked ? 'green' : '' }}>
+                <span>&#128077;</span>
+                <span>{movie.likes}</span>
               </div>
-              <h2>
-                <strong>{movie.title}</strong>
-              </h2>
-              <p>{movie.category}</p>
-              <div className="like-bar">
-                <div
-                  className={movie.liked ? 'liked like' : 'like'}
-                  style={{ backgroundColor: movie.liked ? 'green' : '' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLike(movie.id);
-                  }}
-                >
-                  <span>&#128077;</span>
-                  <span>{movie.likes}</span>
-                </div>
-                <div
-                  className={movie.disliked ? 'disliked dislike' : 'dislike'}
-                  style={{ backgroundColor: movie.disliked ? 'red' : '' }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleDislike(movie.id);
-                  }}
-                >
-                  <span>&#128078;</span>
-                  <span>{movie.dislikes}</span>
-                </div>
+              <div onClick={() => DislikeMovie(movie.id)} className={movie.disliked ? 'disliked dislike' : 'dislike'} style={{ backgroundColor: movie.disliked ? 'red' : '' }}>
+                <span>&#128078;</span>
+                <span>{movie.dislikes}</span>
               </div>
             </div>
           </div>
-        ))}
-      </div>
-    );
-  };
+        </div>
+      ))}
+    </div>
+  }
 
-
-  /** Component : AppFooter */
+  // Footer
   const AppFooter = () => {
     return <footer>
       <span>
         Conçu par Emmanuel Ngbame
       </span>
     </footer>
-  }
-
-  /** Component : Movie click handler */
-  const handleMovieClick = (movie: Movie, index: number) => {
-    setCurrentMovieIndex(index);
   }
 
   return (
@@ -275,15 +267,18 @@ const App: React.FC = () => {
         currentMovieIndex={currentMovieIndex}
         setCurrentMovieIndex={setCurrentMovieIndex}
       />
-      {movies.length > 1 && (
-        <FilmFilter />
+
+      {filteredMovies.length > 0 && (
+        <MovieFilterSection />
       )}
-      {movies.length > 0 && (
-      <MovieCards />
+
+      {filteredMovies.length > 0 && (
+        <MovieCardSection/>
       )}
+
       <AppFooter />
     </div>
   );
-}
+};
 
 export default App;

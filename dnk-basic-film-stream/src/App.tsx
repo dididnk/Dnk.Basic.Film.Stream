@@ -24,13 +24,11 @@ const App: React.FC = () => {
       setMovies(updatedMovies);
       setFilteredMovies(updatedMovies);
       setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-      // Set the current movie index to 0 after loading
       setCurrentMovieIndex(0);
     });
   }, []);
 
   useEffect(() => {
-    // Reset currentMovieIndex when filtered movies change
     setCurrentMovieIndex(0);
   }, [filteredMovies]);
 
@@ -42,8 +40,8 @@ const App: React.FC = () => {
             ...movie,
             likes: movie.liked ? movie.likes - 1 : movie.likes + 1,
             liked: !movie.liked,
-            disliked: movie.liked && movie.disliked ? false : movie.disliked,
-            dislikes: movie.disliked && movie.liked ? movie.dislikes - 1 : movie.dislikes,
+            disliked: movie.liked ? false : movie.disliked, // Reset dislike if previously liked
+            dislikes: movie.liked && movie.disliked ? movie.dislikes - 1 : movie.dislikes,
           }
           : movie
       )
@@ -58,7 +56,7 @@ const App: React.FC = () => {
             ...movie,
             dislikes: movie.disliked ? movie.dislikes - 1 : movie.dislikes + 1,
             disliked: !movie.disliked,
-            liked: movie.disliked && movie.liked ? false : movie.liked,
+            liked: movie.disliked ? false : movie.liked, // Reset like if previously disliked
             likes: movie.liked && movie.disliked ? movie.likes - 1 : movie.likes,
           }
           : movie
@@ -71,7 +69,6 @@ const App: React.FC = () => {
     setMovies(updatedMovies);
     setFilteredMovies(updatedMovies);
     setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-    // Update the current movie index after deletion
     setCurrentMovieIndex(0); // Reset to the first movie after deletion
   };
 
@@ -95,7 +92,7 @@ const App: React.FC = () => {
   const paginatedMovies = filteredMovies.slice(startIndex, startIndex + itemsPerPage);
 
   /** Components */
-  /** App header */
+  /** Component : App header */
   const AppHeader: React.FC<{
     movie: Movie | null;
     filteredMovies: Movie[];
@@ -103,8 +100,8 @@ const App: React.FC = () => {
     setCurrentMovieIndex: (index: number) => void;
   }> = ({ movie, filteredMovies, currentMovieIndex, setCurrentMovieIndex }) => {
     const backgroundUrl = movie ? movie.image : DEFAULT_BACKGROUND_URL;
-    const title = movie ? movie.title : 'No Movie Selected';
-    const category = movie ? movie.category : 'N/A';
+    const title = movie ? movie.title : "Exercice Frontend : Listing de vidéos";
+    const category = movie ? movie.category : "Codé par Emmanuel NGBAME";
 
     const previewMovie = () => {
       const newIndex = currentMovieIndex === 0
@@ -160,7 +157,7 @@ const App: React.FC = () => {
     );
   };
 
-  /** Filter */
+  /** Componenet : Filter */
   const FilmFilter = () => {
     return <div className='filter-content'>
       <h3>Filtrer le film</h3>
@@ -193,61 +190,76 @@ const App: React.FC = () => {
     </div>
   }
 
+  /** Component : Movies (cards) */
+  const MovieCards = () => {
+    return <div className="movies-grid">
+      {paginatedMovies.map((movie, index) => (
+        <div
+          key={movie.id}
+          className="movie-card"
+          onClick={() => handleMovieClick(movie, startIndex + index)}
+        >
+          <div className="image" style={{ background: `url(${movie.image}) no-repeat center center`, backgroundSize: 'cover' }}>
+          </div>
+          <div className="details">
+            <div className="delete">
+              <button onClick={() => deleteMovie(movie.id)}>✖</button>
+            </div>
+            <h2><strong>{movie.title}</strong></h2>
+            <p>{movie.category}</p>
+            <div className="like-bar">
+              <div className={movie.liked ? 'liked like' : 'like'}
+                style={{ backgroundColor: movie.liked ? 'green' : '' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleLike(movie.id);
+                }}>
+                <span>&#128077;</span>
+                <span>{movie.likes}</span>
+              </div>
+              <div className={movie.disliked ? 'disliked dislike' : 'dislike'}
+                style={{ backgroundColor: movie.disliked ? 'red' : '' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleDislike(movie.id);
+                }}>
+                <span>&#128078;</span>
+                <span>{movie.dislikes}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  }
+
+  /** Component : AppFooter */
+  const AppFooter = () => {
+    return <footer>
+      <span>
+        Conçu par Emmanuel Ngbame
+      </span>
+    </footer>
+  }
+
+  /** Component : Movie click handler */
   const handleMovieClick = (movie: Movie, index: number) => {
     setCurrentMovieIndex(index);
-  };
+  }
 
   return (
-    <div className="app-container">
+    <div className="App">
       <AppHeader
-        movie={filteredMovies[currentMovieIndex] || null}
+        movie={filteredMovies[currentMovieIndex]}
         filteredMovies={filteredMovies}
         currentMovieIndex={currentMovieIndex}
         setCurrentMovieIndex={setCurrentMovieIndex}
       />
-
       <FilmFilter />
-
-      <div className="movies-grid">
-        {paginatedMovies.map((movie, index) => (
-          <div
-            key={movie.id}
-            className="movie-card"
-            style={{ background: `url(${movie.image}) no-repeat center center`, backgroundSize: 'cover' }}
-            onClick={() => handleMovieClick(movie, startIndex + index)} // Update index
-          >
-            <h2><strong>{movie.title}</strong></h2>
-            <p>{movie.category}</p>
-            <div className="like-bar">
-              <div>{movie.likes} Likes</div>
-              <div>{movie.dislikes} Dislikes</div>
-            </div>
-            <div className="actions">
-              <button
-                className={movie.liked ? 'liked' : ''}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent card click event
-                  toggleLike(movie.id);
-                }}
-              >
-                {movie.liked ? 'Unlike' : 'Like'}
-              </button>
-              <button
-                className={movie.disliked ? 'disliked' : ''}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent card click event
-                  toggleDislike(movie.id);
-                }}
-              >
-                {movie.disliked ? 'Undislike' : 'Dislike'}
-              </button>
-            </div>
-            <button onClick={() => deleteMovie(movie.id)}>Delete</button>
-          </div>
-        ))}
-      </div>
+      <MovieCards />
+      <AppFooter/>
     </div>
   );
-};
+}
 
 export default App;

@@ -94,6 +94,8 @@ const App: React.FC = () => {
   const startIndex = (page - 1) * itemsPerPage;
   const paginatedMovies = filteredMovies.slice(startIndex, startIndex + itemsPerPage);
 
+  /** Components */
+  /** App header */
   const AppHeader: React.FC<{
     movie: Movie | null;
     filteredMovies: Movie[];
@@ -128,7 +130,7 @@ const App: React.FC = () => {
       >
         <div className="header-content">
           <div className="navigation" onClick={previewMovie}>
-            <span>&#9204;</span> {/* Left arrow */}
+            <span>&#9204;</span>
           </div>
           <div className="details">
             <div className="title">
@@ -139,7 +141,7 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="navigation" onClick={nextMovie}>
-            <span>&#9205;</span> {/* Right arrow */}
+            <span>&#9205;</span>
           </div>
         </div>
 
@@ -158,6 +160,39 @@ const App: React.FC = () => {
     );
   };
 
+  /** Filter */
+  const FilmFilter = () => {
+    return <div className='filter-content'>
+      <h3>Filtrer le film</h3>
+      <div className="filter">
+        {categories.map((category) => (
+          <label key={category} className="checkbox">
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(category)}
+              onChange={() => handleFilterChange(category)}
+            />
+            <span>{category}</span>
+          </label>
+        ))}
+      </div>
+      <h3>Gérer l'affichage des films</h3>
+      <div className="pagination">
+        <button disabled={page === 1} onClick={handlePrevPage}>
+          <span>&#9204;</span>
+        </button>
+        <select onChange={(e) => setItemsPerPage(parseInt(e.target.value))} value={itemsPerPage}>
+          <option value={4}>4</option>
+          <option value={8}>8</option>
+          <option value={12}>12</option>
+        </select>
+        <button onClick={handleNextPage}>
+          <span>&#9205;</span>
+        </button>
+      </div>
+    </div>
+  }
+
   const handleMovieClick = (movie: Movie, index: number) => {
     setCurrentMovieIndex(index);
   };
@@ -171,31 +206,7 @@ const App: React.FC = () => {
         setCurrentMovieIndex={setCurrentMovieIndex}
       />
 
-      <div className="filter">
-        <h3>Filter by Category:</h3>
-        {categories.map((category) => (
-          <label key={category}>
-            <input
-              type="checkbox"
-              checked={selectedCategories.includes(category)}
-              onChange={() => handleFilterChange(category)}
-            />
-            {category}
-          </label>
-        ))}
-      </div>
-
-      <div className="pagination">
-        <button disabled={page === 1} onClick={handlePrevPage}>
-          Previous
-        </button>
-        <button onClick={handleNextPage}>Next</button>
-        <select onChange={(e) => setItemsPerPage(parseInt(e.target.value))} value={itemsPerPage}>
-          <option value={4}>4</option>
-          <option value={8}>8</option>
-          <option value={12}>12</option>
-        </select>
-      </div>
+      <FilmFilter />
 
       <div className="movies-grid">
         {paginatedMovies.map((movie, index) => (

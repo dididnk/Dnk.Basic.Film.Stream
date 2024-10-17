@@ -8,7 +8,7 @@ const DEFAULT_BACKGROUND_URL = 'https://dididnk.github.io/Portfolio/include/img/
 const App: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
-  const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
+  const [currentMovieIndex, setCurrentMovieIndex] = useState<number>(0); // Track movie index
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -24,14 +24,14 @@ const App: React.FC = () => {
       setMovies(updatedMovies);
       setFilteredMovies(updatedMovies);
       setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-      // Set the current movie to the first one after loading
-      setCurrentMovie(updatedMovies[0] || null);
+      // Set the current movie index to 0 after loading
+      setCurrentMovieIndex(0);
     });
   }, []);
 
   useEffect(() => {
-    // Update the current movie when filtered movies change
-    setCurrentMovie(filteredMovies[0] || null);
+    // Reset currentMovieIndex when filtered movies change
+    setCurrentMovieIndex(0);
   }, [filteredMovies]);
 
   const toggleLike = (id: string) => {
@@ -71,8 +71,8 @@ const App: React.FC = () => {
     setMovies(updatedMovies);
     setFilteredMovies(updatedMovies);
     setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-    // Update the current movie after deletion
-    setCurrentMovie(updatedMovies[0] || null);
+    // Update the current movie index after deletion
+    setCurrentMovieIndex(0); // Reset to the first movie after deletion
   };
 
   const handleFilterChange = (category: string) => {
@@ -94,10 +94,29 @@ const App: React.FC = () => {
   const startIndex = (page - 1) * itemsPerPage;
   const paginatedMovies = filteredMovies.slice(startIndex, startIndex + itemsPerPage);
 
-  const AppHeader: React.FC<{ movie: Movie | null }> = ({ movie }) => {
+  const AppHeader: React.FC<{
+    movie: Movie | null;
+    filteredMovies: Movie[];
+    currentMovieIndex: number;
+    setCurrentMovieIndex: (index: number) => void;
+  }> = ({ movie, filteredMovies, currentMovieIndex, setCurrentMovieIndex }) => {
     const backgroundUrl = movie ? movie.image : DEFAULT_BACKGROUND_URL;
     const title = movie ? movie.title : 'No Movie Selected';
     const category = movie ? movie.category : 'N/A';
+
+    const previewMovie = () => {
+      const newIndex = currentMovieIndex === 0
+        ? filteredMovies.length - 1
+        : currentMovieIndex - 1;
+      setCurrentMovieIndex(newIndex);
+    };
+
+    const nextMovie = () => {
+      const newIndex = currentMovieIndex === filteredMovies.length - 1
+        ? 0
+        : currentMovieIndex + 1;
+      setCurrentMovieIndex(newIndex);
+    };
 
     return (
       <div
@@ -108,8 +127,8 @@ const App: React.FC = () => {
         }}
       >
         <div className="header-content">
-          <div className="navigation">
-            <i className="fas fa-chevron-left"></i>
+          <div className="navigation" onClick={previewMovie}>
+            <span>&#9204;</span> {/* Left arrow */}
           </div>
           <div className="details">
             <div className="title">
@@ -119,28 +138,38 @@ const App: React.FC = () => {
               <span>{category}</span>
             </div>
           </div>
-          <div className="navigation">
-            <i className="fas fa-chevron-right"></i>
+          <div className="navigation" onClick={nextMovie}>
+            <span>&#9205;</span> {/* Right arrow */}
           </div>
         </div>
 
         <div className="dot">
-          <input type="radio" name="position" defaultChecked />
-          <input type="radio" name="position" />
-          <input type="radio" name="position" />
+          {Array.from({ length: filteredMovies.length }).map((_, index) => (
+            <input
+              key={index}
+              type="radio"
+              name="position"
+              checked={index === currentMovieIndex}
+              onChange={() => setCurrentMovieIndex(index)}
+            />
+          ))}
         </div>
       </div>
     );
   };
 
-  const handleMovieClick = (movie: Movie) => {
-    setCurrentMovie(movie);
+  const handleMovieClick = (movie: Movie, index: number) => {
+    setCurrentMovieIndex(index);
   };
 
   return (
     <div className="app-container">
-      <AppHeader movie={currentMovie} />
-      <h1>Movie List</h1>
+      <AppHeader
+        movie={filteredMovies[currentMovieIndex] || null}
+        filteredMovies={filteredMovies}
+        currentMovieIndex={currentMovieIndex}
+        setCurrentMovieIndex={setCurrentMovieIndex}
+      />
 
       <div className="filter">
         <h3>Filter by Category:</h3>
@@ -169,12 +198,12 @@ const App: React.FC = () => {
       </div>
 
       <div className="movies-grid">
-        {paginatedMovies.map((movie) => (
+        {paginatedMovies.map((movie, index) => (
           <div
             key={movie.id}
             className="movie-card"
             style={{ background: `url(${movie.image}) no-repeat center center`, backgroundSize: 'cover' }}
-            onClick={() => handleMovieClick(movie)} // Set current movie on card click
+            onClick={() => handleMovieClick(movie, startIndex + index)} // Update index
           >
             <h2><strong>{movie.title}</strong></h2>
             <p>{movie.category}</p>

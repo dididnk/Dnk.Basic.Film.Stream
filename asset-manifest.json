@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/dididnk/Dnk.Basic.Film.Stream/static/css/main.5fa9446f.css",
+    "main.js": "/dididnk/Dnk.Basic.Film.Stream/static/js/main.77676393.js",
+    "static/js/453.f64efbf2.chunk.js": "/dididnk/Dnk.Basic.Film.Stream/static/js/453.f64efbf2.chunk.js",
+    "index.html": "/dididnk/Dnk.Basic.Film.Stream/index.html",
+    "main.5fa9446f.css.map": "/dididnk/Dnk.Basic.Film.Stream/static/css/main.5fa9446f.css.map",
+    "main.77676393.js.map": "/dididnk/Dnk.Basic.Film.Stream/static/js/main.77676393.js.map",
+    "453.f64efbf2.chunk.js.map": "/dididnk/Dnk.Basic.Film.Stream/static/js/453.f64efbf2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5fa9446f.css",
+    "static/js/main.77676393.js"
+  ]
+}

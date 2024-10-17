@@ -26,7 +26,7 @@ const App: React.FC = () => {
       setFilteredMovies(updatedMovies);
       setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
       setCurrentMovieIndex(0);
-      setPaginatedMovies(updatedMovies.slice(0, itemsPerPage)); 
+      setPaginatedMovies(updatedMovies.slice(0, itemsPerPage));
     });
   }, [itemsPerPage]);
 
@@ -39,18 +39,18 @@ const App: React.FC = () => {
   const handlePrevPage = () => setPage((prevPage) => (prevPage > 1 ? prevPage - 1 : 1));
 
   const startIndex = (page - 1) * itemsPerPage;
-  
+
   const toggleLike = (id: string) => {
     setMovies((prevMovies) =>
       prevMovies.map((movie) =>
         movie.id === id
           ? {
-              ...movie,
-              likes: movie.liked ? movie.likes - 1 : movie.likes + 1,
-              liked: !movie.liked,
-              disliked: false,
-              dislikes: movie.liked ? movie.dislikes - (movie.disliked ? 1 : 0) : movie.dislikes,
-            }
+            ...movie,
+            likes: movie.liked ? movie.likes - 1 : movie.likes + 1,
+            liked: !movie.liked,
+            disliked: false,
+            dislikes: movie.liked ? movie.dislikes - (movie.disliked ? 1 : 0) : movie.dislikes,
+          }
           : movie
       )
     );
@@ -61,12 +61,12 @@ const App: React.FC = () => {
       prevMovies.map((movie) =>
         movie.id === id
           ? {
-              ...movie,
-              dislikes: movie.disliked ? movie.dislikes - 1 : movie.dislikes + 1,
-              disliked: !movie.disliked,
-              liked: false,
-              likes: movie.disliked ? movie.likes - (movie.liked ? 1 : 0) : movie.likes,
-            }
+            ...movie,
+            dislikes: movie.disliked ? movie.dislikes - 1 : movie.dislikes + 1,
+            disliked: !movie.disliked,
+            liked: false,
+            likes: movie.disliked ? movie.likes - (movie.liked ? 1 : 0) : movie.likes,
+          }
           : movie
       )
     );
@@ -77,7 +77,7 @@ const App: React.FC = () => {
     setMovies(updatedMovies);
     setFilteredMovies(updatedMovies);
     setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-    setCurrentMovieIndex(0); 
+    setCurrentMovieIndex(0);
   };
 
   const handleFilterChange = (category: string) => {
@@ -162,19 +162,7 @@ const App: React.FC = () => {
   /** Componenet : Filter */
   const FilmFilter = () => {
     return <div className='filter-content'>
-      <h3>Filtrer le film</h3>
-      <div className="filter">
-        {categories.map((category) => (
-          <label key={category} className="checkbox">
-            <input
-              type="checkbox"
-              checked={selectedCategories.includes(category)}
-              onChange={() => handleFilterChange(category)}
-            />
-            <span>{category}</span>
-          </label>
-        ))}
-      </div>
+    <div className="filter-pagination-details">
       <h3>Gérer l'affichage des films</h3>
       <div className="pagination">
         <button disabled={page === 1} onClick={handlePrevPage}>
@@ -188,6 +176,22 @@ const App: React.FC = () => {
         <button onClick={handleNextPage}>
           <span>&#9205;</span>
         </button>
+      </div>
+    </div>
+      <div className="filter-content-details">
+        <h3>Filtrer le film</h3>
+        <div className="filter">
+          {categories.map((category) => (
+            <label key={category} className="checkbox">
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes(category)}
+                onChange={() => handleFilterChange(category)}
+              />
+              <span>{category}</span>
+            </label>
+          ))}
+        </div>
       </div>
     </div>
   }

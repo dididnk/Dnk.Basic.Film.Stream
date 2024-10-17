@@ -15,6 +15,7 @@ html {
   flex-direction: column;
   background: white;
 }
+
 /* header section */
 .header {
   height: 650px;
@@ -71,6 +72,7 @@ html {
   border-radius: 10px;
   padding: 10px;
   font-weight: bold;
+  font-size: 50px;
 }
 
 .header .header-content .details .category {
@@ -78,6 +80,7 @@ html {
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 10px;
+  font-size: 30px;
 }
 
 /* filter section */
@@ -97,6 +100,7 @@ html {
 
 .filter-content h3{
   margin-bottom: 10px;
+  font-size: 14px;
 }
 
 .filter-content .filter,
@@ -113,6 +117,8 @@ html {
 
 .filter-content .filter .checkbox {
   cursor: pointer;
+  text-transform: capitalize;
+  font-size: 12px;
 }
 
 .filter-content .filter .checkbox:hover {
@@ -260,4 +266,205 @@ footer {
   align-items: center;
   color: white;
   font-size: 18px;
+}
+
+/* responsive media query start */
+@media (max-width: 1104px) {
+  .header {
+    height: 500px;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header .header-content {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .header .header-content .navigation {
+    width: 40px;
+    padding: 10px;
+  }
+  
+  .header .header-content .navigation span {
+    font-size: 28px;
+  }
+  
+  .header .header-content .details {
+    height: 60%;
+    padding: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .header .header-content .details .title {
+    padding: 10px;
+    font-size: 48px;
+  }
+  
+  .header .header-content .details .category {
+    padding: 10px;
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 991px) {
+  .header {
+    height: 400px;
+    padding: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header .header-content {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .header .header-content .navigation {
+    width: 36px;
+    padding: 8px;
+  }
+  
+  .header .header-content .navigation span {
+    font-size: 28px;
+  }
+  
+  .header .header-content .details {
+    height: 60%;
+    padding: 8px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .header .header-content .details .title {
+    padding: 8px;
+    font-size: 46px;
+  }
+  
+  .header .header-content .details .category {
+    padding: 8px;
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 947px) {
+  .header {
+    height: 380px;
+    padding: 7px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header .header-content {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .header .header-content .navigation {
+    width: 34px;
+    padding: 7px;
+  }
+  
+  .header .header-content .navigation span {
+    font-size: 24px;
+  }
+  
+  .header .header-content .details {
+    height: 50%;
+    padding: 7px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .header .header-content .details .title {
+    padding: 7px;
+    font-size: 44px;
+  }
+  
+  .header .header-content .details .category {
+    padding: 7px;
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 690px) {
+  .header {
+    height: 350px;
+    padding: 6px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header .header-content {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .header .header-content .navigation {
+    width: 32px;
+    padding: 6px;
+  }
+  
+  .header .header-content .navigation span {
+    font-size: 22px;
+  }
+  
+  .header .header-content .details {
+    height: 50%;
+    padding: 6px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .header .header-content .details .title {
+    padding: 6px;
+    font-size: 42px;
+  }
+  
+  .header .header-content .details .category {
+    padding: 6px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .header {
+    height: 300px;
+    padding: 5px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header .header-content {
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .header .header-content .navigation {
+    width: 30px;
+    padding: 5px;
+  }
+  
+  .header .header-content .navigation span {
+    font-size: 20px;
+  }
+  
+  .header .header-content .details {
+    height: 50%;
+    padding: 5px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .header .header-content .details .title {
+    padding: 5px;
+    font-size: 40px;
+  }
+  
+  .header .header-content .details .category {
+    padding: 5px;
+    font-size: 18px;
+  }
 }

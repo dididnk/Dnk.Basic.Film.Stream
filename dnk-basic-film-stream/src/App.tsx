@@ -8,11 +8,12 @@ const DEFAULT_BACKGROUND_URL = 'https://dididnk.github.io/Portfolio/include/img/
 const App: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
-  const [currentMovieIndex, setCurrentMovieIndex] = useState<number>(0); // Track movie index
+  const [currentMovieIndex, setCurrentMovieIndex] = useState<number>(0);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [page, setPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(4);
+  const [paginatedMovies, setPaginatedMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
     movies$.then((data: Movie[]) => {
@@ -25,24 +26,31 @@ const App: React.FC = () => {
       setFilteredMovies(updatedMovies);
       setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
       setCurrentMovieIndex(0);
+      setPaginatedMovies(updatedMovies.slice(0, itemsPerPage)); 
     });
-  }, []);
+  }, [itemsPerPage]);
 
   useEffect(() => {
-    setCurrentMovieIndex(0);
-  }, [filteredMovies]);
+    const startIndex = (page - 1) * itemsPerPage;
+    setPaginatedMovies(movies.slice(startIndex, startIndex + itemsPerPage));
+  }, [movies, page, itemsPerPage]);
 
+  const handleNextPage = () => setPage((prevPage) => prevPage + 1);
+  const handlePrevPage = () => setPage((prevPage) => (prevPage > 1 ? prevPage - 1 : 1));
+
+  const startIndex = (page - 1) * itemsPerPage;
+  
   const toggleLike = (id: string) => {
     setMovies((prevMovies) =>
       prevMovies.map((movie) =>
         movie.id === id
           ? {
-            ...movie,
-            likes: movie.liked ? movie.likes - 1 : movie.likes + 1,
-            liked: !movie.liked,
-            disliked: movie.liked ? false : movie.disliked, // Reset dislike if previously liked
-            dislikes: movie.liked && movie.disliked ? movie.dislikes - 1 : movie.dislikes,
-          }
+              ...movie,
+              likes: movie.liked ? movie.likes - 1 : movie.likes + 1,
+              liked: !movie.liked,
+              disliked: false,
+              dislikes: movie.liked ? movie.dislikes - (movie.disliked ? 1 : 0) : movie.dislikes,
+            }
           : movie
       )
     );
@@ -53,12 +61,12 @@ const App: React.FC = () => {
       prevMovies.map((movie) =>
         movie.id === id
           ? {
-            ...movie,
-            dislikes: movie.disliked ? movie.dislikes - 1 : movie.dislikes + 1,
-            disliked: !movie.disliked,
-            liked: movie.disliked ? false : movie.liked, // Reset like if previously disliked
-            likes: movie.liked && movie.disliked ? movie.likes - 1 : movie.likes,
-          }
+              ...movie,
+              dislikes: movie.disliked ? movie.dislikes - 1 : movie.dislikes + 1,
+              disliked: !movie.disliked,
+              liked: false,
+              likes: movie.disliked ? movie.likes - (movie.liked ? 1 : 0) : movie.likes,
+            }
           : movie
       )
     );
@@ -69,7 +77,7 @@ const App: React.FC = () => {
     setMovies(updatedMovies);
     setFilteredMovies(updatedMovies);
     setCategories([...new Set(updatedMovies.map((movie) => movie.category))]);
-    setCurrentMovieIndex(0); // Reset to the first movie after deletion
+    setCurrentMovieIndex(0); 
   };
 
   const handleFilterChange = (category: string) => {
@@ -84,12 +92,6 @@ const App: React.FC = () => {
     );
     setFilteredMovies(filtered);
   };
-
-  const handleNextPage = () => setPage((prevPage) => prevPage + 1);
-  const handlePrevPage = () => setPage((prevPage) => (prevPage > 1 ? prevPage - 1 : 1));
-
-  const startIndex = (page - 1) * itemsPerPage;
-  const paginatedMovies = filteredMovies.slice(startIndex, startIndex + itemsPerPage);
 
   /** Components */
   /** Component : App header */
@@ -192,46 +194,60 @@ const App: React.FC = () => {
 
   /** Component : Movies (cards) */
   const MovieCards = () => {
-    return <div className="movies-grid">
-      {paginatedMovies.map((movie, index) => (
-        <div
-          key={movie.id}
-          className="movie-card"
-          onClick={() => handleMovieClick(movie, startIndex + index)}
-        >
-          <div className="image" style={{ background: `url(${movie.image}) no-repeat center center`, backgroundSize: 'cover' }}>
-          </div>
-          <div className="details">
-            <div className="delete">
-              <button onClick={() => deleteMovie(movie.id)}>✖</button>
-            </div>
-            <h2><strong>{movie.title}</strong></h2>
-            <p>{movie.category}</p>
-            <div className="like-bar">
-              <div className={movie.liked ? 'liked like' : 'like'}
-                style={{ backgroundColor: movie.liked ? 'green' : '' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleLike(movie.id);
-                }}>
-                <span>&#128077;</span>
-                <span>{movie.likes}</span>
+    return (
+      <div className="movies-grid">
+        {paginatedMovies.map((movie, index) => (
+          <div
+            key={movie.id}
+            className="movie-card"
+            onClick={() => handleMovieClick(movie, startIndex + index)}
+          >
+            <div
+              className="image"
+              style={{
+                background: `url(${movie.image}) no-repeat center center`,
+                backgroundSize: 'cover',
+              }}
+            ></div>
+            <div className="details">
+              <div className="delete">
+                <button onClick={() => deleteMovie(movie.id)}>✖</button>
               </div>
-              <div className={movie.disliked ? 'disliked dislike' : 'dislike'}
-                style={{ backgroundColor: movie.disliked ? 'red' : '' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDislike(movie.id);
-                }}>
-                <span>&#128078;</span>
-                <span>{movie.dislikes}</span>
+              <h2>
+                <strong>{movie.title}</strong>
+              </h2>
+              <p>{movie.category}</p>
+              <div className="like-bar">
+                <div
+                  className={movie.liked ? 'liked like' : 'like'}
+                  style={{ backgroundColor: movie.liked ? 'green' : '' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleLike(movie.id);
+                  }}
+                >
+                  <span>&#128077;</span>
+                  <span>{movie.likes}</span>
+                </div>
+                <div
+                  className={movie.disliked ? 'disliked dislike' : 'dislike'}
+                  style={{ backgroundColor: movie.disliked ? 'red' : '' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleDislike(movie.id);
+                  }}
+                >
+                  <span>&#128078;</span>
+                  <span>{movie.dislikes}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
-  }
+        ))}
+      </div>
+    );
+  };
+
 
   /** Component : AppFooter */
   const AppFooter = () => {
@@ -257,7 +273,7 @@ const App: React.FC = () => {
       />
       <FilmFilter />
       <MovieCards />
-      <AppFooter/>
+      <AppFooter />
     </div>
   );
 }

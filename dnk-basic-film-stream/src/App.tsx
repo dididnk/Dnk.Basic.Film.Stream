@@ -128,8 +128,8 @@ const App: React.FC = () => {
     const DEFAULT_BACKGROUND_URL = 'https://dididnk.github.io/Portfolio/include/img/Mybackground-1.jpg';
 
     const backgroundUrl = movie ? movie.image : DEFAULT_BACKGROUND_URL;
-    const title = movie ? movie.title : "Exercice Frontend : Listing de vidéos";
-    const category = movie ? movie.category : "Codé par Emmanuel NGBAME";
+    const title = movie ? movie.title : "Video Listing";
+    const category = movie ? movie.category : "by Emmanuel NGBAME";
 
     const previewMovie = () => {
       const newIndex = currentMovieIndex === 0
@@ -155,7 +155,7 @@ const App: React.FC = () => {
       >
         <div className="header-content">
           <div className="navigation" onClick={previewMovie}>
-            <span>&#9204;</span>
+            <span>&laquo;</span>
           </div>
           <div className="details">
             <div className="title">
@@ -166,7 +166,7 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="navigation" onClick={nextMovie}>
-            <span>&#9205;</span>
+            <span>&raquo;</span>
           </div>
         </div>
 
@@ -189,10 +189,10 @@ const App: React.FC = () => {
   const MovieFilterSection = () => {
     return <div className="filter-content">
       <div className="filter-pagination-details">
-        <h3>Gérer l'affichage des films</h3>
+        <h3>Number of pages</h3>
         <div className="pagination">
           <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-            <span>&#9204;</span>
+            <span>&laquo;</span>
           </button>
           <select value={perPage} onChange={(e) => setPerPage(parseInt(e.target.value))}>
             <option value={4}>4</option>
@@ -200,20 +200,27 @@ const App: React.FC = () => {
             <option value={12}>12</option>
           </select>
           <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-            <span>&#9205;</span>
+            <span>&raquo;</span>
           </button>
         </div>
       </div>
       <div className="filter-content-details">
-        <h3>Filtrer le film</h3>
+        <h3>Filter</h3>
         <div className="filter">
           {Array.from(new Set(movies.map((movie) => movie.category))).map((category) => (
-            <label key={category} className="checkbox">
+            <label key={category} className="checkbox-content">              
+              <div className="checkbox-wrapper" >
               <input
                 type="checkbox"
                 checked={selectedCategories.includes(category)}
                 onClick={() => FilterFilmByCategory(category)}
-              />
+                />
+                <svg viewBox="0 0 35.6 35.6">
+                  <circle className="background" cx="17.8" cy="17.8" r="17.8"></circle>
+                  <circle className="stroke" cx="17.8" cy="17.8" r="14.37"></circle>
+                  <polyline className="check" points="11.78 18.12 15.55 22.23 25.17 12.87"></polyline>
+                </svg>
+              </div>
               <span>{category}</span>
             </label>
           ))}

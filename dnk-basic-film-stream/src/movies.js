@@ -21,8 +21,8 @@ const movies = [
         id: '3',
         title: 'Les indestructibles 2',
         category: 'Animation',
-        likes: 3,
-        dislikes: 1,
+        likes: 3000000,
+        dislikes: 1500,
         image: "https://wallpaper.forfun.com/fetch/25/25245771d3ceea2334ae8a61b8e4a87d.jpeg?w=1200&r=0.5625",
         liked: false,
         disliked: false

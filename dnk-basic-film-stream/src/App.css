@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Gabriela&family=Imperial+Script&display=swap');
 * {
   margin: 0;
   padding: 0;
@@ -65,22 +66,6 @@ html {
   flex-direction: column;
   align-items: start;
   justify-content: space-between;
-}
-
-.header .header-content .details .title {
-  background-color: rgba(211, 211, 211, 0.22);
-  border-radius: 10px;
-  padding: 10px;
-  font-weight: bold;
-  font-size: 50px;
-}
-
-.header .header-content .details .category {
-  background-color: rgba(211, 211, 211, 0.22);
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
-  font-size: 30px;
 }
 
 /* filter section */
@@ -201,7 +186,6 @@ h3 {
   margin: 0;
   opacity: 0;
   -appearance: none;
-  -webkit-appearance: none;
 }
 
 .checkbox-wrapper input[type=checkbox]:hover {
@@ -257,9 +241,8 @@ h3 {
 }
 
 .movies-grid .movie-card {
-  cursor: ew-resize;
   width: 400px;
-  height: 180px;
+  height: 250px;
   border-radius: 10px;
   margin: 5px;
   padding: 5px;
@@ -267,6 +250,7 @@ h3 {
   justify-content: center;
   align-items: center;
   background-color: lightgray;
+  border: 1px solid rgb(88, 86, 86);
 }
 
 .movies-grid .movie-card .image {
@@ -286,69 +270,122 @@ h3 {
   justify-content: space-between;
 }
 
+.movies-grid .movie-card .details .title-cat{
+  font-family: "Gabriela", serif;
+  font-weight: 400;
+  font-style: normal;
+  width: 100%;
+  flex: 1;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+
 .movies-grid .movie-card .details h2 {
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 20px;
 }
 
-.movies-grid .movie-card .details .delete {
-  width: 100%;
-  display: flex;
-  justify-content: end;
-  align-items: center;
-}
-
-.movies-grid .movie-card .details .delete button {
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  border-radius: 30px;
-  border: 1px solid red;
-  color: red;
-  background-color: white;
-}
-
-.movies-grid .movie-card .details .delete button:hover {
-  border: 1px solid white;
-  color: white;
-  background-color: red;
+.movies-grid .movie-card .details p {
+  font-size: 16px;
 }
 
 .movies-grid .movie-card .details .like-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   height: 35px;
   background-color: rgba(149, 149, 149, 0.268);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   border-radius: 30px;
+  margin-bottom: 20px;
 }
 
-.movies-grid .movie-card .details .like-bar .like,
-.movies-grid .movie-card .details .like-bar .dislike {
-  min-width: 60px;
-  height: 100%;
+.movies-grid .movie-card .details svg,
+.movies-grid .movie-card .details span {
+  margin-right: 2px;
+}
+
+.movies-grid .movie-card .details .like-bar div{
   cursor: pointer;
+  flex: 1;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 5px;
+  border: 1px solid rgb(88, 86, 86);
 }
 
-.movies-grid .movie-card .details .like-bar .like {
-  border-right: 1px solid gray;
+.movies-grid .movie-card .details .like-bar div:hover{
+  background: rgb(136, 129, 129);
+}
+
+.movies-grid .movie-card .details .like-bar .like{
   border-radius: 30px 0 0 30px;
+  border-right: 1px solid rgb(162, 158, 158);
 }
 
 .movies-grid .movie-card .details .like-bar .dislike {
   border-radius: 0 30px 30px 0;
 }
 
-.movies-grid .movie-card .details .like-bar .like:hover {
-  background-color: rgb(120, 226, 120);
+/* Button delete */
+.delete-button-box {
+  cursor: pointer;
+  width: 100%;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border: none;
+  border-radius: 5px;
+  background: #e02b2b;
+  margin-bottom: 5px;
 }
 
-.movies-grid .movie-card .details .like-bar .dislike:hover {
-  background-color: rgb(226, 53, 53);
+.delete-button-box:hover {
+  background: #e74242;
+}
+
+button .text {
+  color: white;
+  font-weight: bold;
+}
+
+button .icon {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  visibility: hidden;
+}
+
+button svg {
+  width: 15px;
+  fill: #eee;
+}
+
+button:hover .text {
+  color: transparent;
+}
+
+button:hover .icon {
+  width: 150px;
+  border-left: none;
+  transform: translateX(0);
+  visibility: visible;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:active .icon svg {
+  transform: scale(0.8);
 }
 
 footer {
